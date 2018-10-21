@@ -9,11 +9,17 @@ let model = {
     time: 0
 };
 
-let view = (model) => {
-    let minutes = Math.floor(model.time / 60);
-    let seconds = model.time - (minutes * 60);
-    let secondsFormatted = `${seconds < 10 ? '0' : ''}${seconds}`
-    return <div>{minutes}:{secondsFormatted}</div>
+let view = (m) => {
+    let minutes = Math.floor(m.time / 60);
+    let seconds = m.time - (minutes * 60);
+    let secondsFormatted = `${seconds < 10 ? '0' : ''}${seconds}`;
+    let handler = (event) => {
+        model = update(model, m.running ? 'STOP':'START');
+    };
+    return <div>
+    <p>{minutes}:{secondsFormatted}</p>
+    <button onClick={handler}>{m.running ? 'STOP':'START'}</button>
+    </div>;
 };
 
 let intents = {
@@ -25,7 +31,9 @@ let intents = {
 
 const update = (model, intent) => {
     const updates = {
-        'TICK': (model) => Object.assign(model, {time: model.time + 1})
+        'TICK': (model) => Object.assign(model, {time: model.time + (model.running ? 1 : 0)}),
+        'START': (model) => Object.assign(model, {running: true}),
+        'STOP':(model) => Object.assign(model, {running: false})
     };
     return updates[intent](model);
 };
